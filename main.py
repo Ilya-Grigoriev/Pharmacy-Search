@@ -27,7 +27,14 @@ params = {
     'll': ','.join([lon, lat])
 }
 response = requests.get(metro_request, params=params).json()
-pharmacy_coord = list(map(str, response['features'][0]['geometry']['coordinates']))
+pharmacy = response['features'][0]
+pharmacy_coord = list(map(str, pharmacy['geometry']['coordinates']))
+pharmacy_address = pharmacy['properties']['description']
+pharmacy_name = pharmacy['properties']['name']
+pharmacy_work = pharmacy['properties']['CompanyMetaData']['Hours']['text']
+print(f'Адрес аптеки: {pharmacy_address}')
+print(f'Название аптеки: {pharmacy_name}')
+print(f'График работы аптеки: {pharmacy_work}')
 map_params = {
     "l": "map",
     'pl': f'{",".join(pharmacy_coord)},{",".join([lon, lat])}',
@@ -37,4 +44,4 @@ map_api_server = "http://static-maps.yandex.ru/1.x/"
 response = requests.get(map_api_server, params=map_params)
 Image.open(BytesIO(
     response.content)).show()
-print(lonlat_distance(map(float, pharmacy_coord), map(float, [lon, lat])))
+print(f'Расстояние от адреса до аптеки: {lonlat_distance(map(float, pharmacy_coord), map(float, [lon, lat]))}')
